@@ -33,6 +33,10 @@ clean:
 depend:
 	$(MAKEDEPEND) -Y. $(LBM_SOURCES) display.c
 
+atom:
+	atom *.c
+	atom *.h
+
 .PHONY: clean all depend
 
 # DO NOT DELETE
