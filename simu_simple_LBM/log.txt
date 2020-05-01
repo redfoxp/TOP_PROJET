@@ -1,0 +1,19 @@
+time mpirun -np 2 ./lbm
+
+iterations           = 100
+width                = 800
+height               = 160
+obstacle_r           = 17.000000
+obstacle_x           = 161.000000
+obstacle_y           = 83.000000
+reynolds             = 100.000000
+reynolds             = 100.000000
+inflow_max_velocity  = 0.100000
+output_filename      = resultat.raw
+write_interval       = 10
+
+real	1m45,395s
+user	0m12,526s
+sys	0m0,065s
+
+///----------------------------------------///

@@ -58,8 +58,6 @@ FILE * open_output_file(lbm_comm_t * mesh_comm)
 }
 
 void close_file(FILE* fp){
-	//wait all before closing
-	MPI_Barrier(MPI_COMM_WORLD);
 	//close file
 	fclose(fp);
 }
@@ -100,7 +98,7 @@ void save_frame(FILE * fp,const Mesh * mesh)
 
 			//errors
 			assert(cnt <= WRITE_BUFFER_ENTRIES);
-			
+
 			//flush buffer if full
 			if (cnt == WRITE_BUFFER_ENTRIES)
 			{
@@ -197,6 +195,10 @@ int main(int argc, char * argv[])
 			save_frame_all_domain(fp, &mesh, &temp_render );
 	}
 
+	printf("rank %d \n", rank);
+	//wait all before closing
+	MPI_Barrier(MPI_COMM_WORLD);
+
 	if( rank == RANK_MASTER && fp != NULL)
 	{
 		close_file(fp);
@@ -208,6 +210,7 @@ int main(int argc, char * argv[])
 	Mesh_release( &temp );
 	Mesh_release( &temp_render );
 	lbm_mesh_type_t_release( &mesh_type );
+	printf("rank finished %d \n", rank);
 
 	//close MPI
 	MPI_Finalize();
