@@ -7,5 +7,5 @@ height               = 160
 reynolds             = 100
 inflow_max_velocity  = 0.100000
 inflow_max_velocity  = 0.100000
-output_filename      = resultat.raw
+output_filename      = result.raw
 write_interval       = 20

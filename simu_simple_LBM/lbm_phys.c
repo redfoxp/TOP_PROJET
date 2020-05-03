@@ -25,11 +25,17 @@ const Vector direction_matrix[DIRECTIONS] = {
  * Poids utilisé pour compenser les différentes de longueur des 9 vecteurs directions.
 **/
 #if DIRECTIONS == 9
+//const double equil_weight[DIRECTIONS] = {
+//	4.0/9.0 ,
+//	1.0/9.0 , 1.0/9.0 , 1.0/9.0 , 1.0/9.0,
+//	1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0
+//};
 const double equil_weight[DIRECTIONS] = {
-	4.0/9.0 ,
-	1.0/9.0 , 1.0/9.0 , 1.0/9.0 , 1.0/9.0,
-	1.0/36.0, 1.0/36.0, 1.0/36.0, 1.0/36.0
+	0.444444 ,
+	0.111111 , 0.111111 , 0.111111 , 0.111111,
+	0.027778, 0.027778, 0.027778, 0.027778
 };
+
 //opposite directions, for bounce back implementation
 const int opposite_of[DIRECTIONS] = { 0, 3, 4, 1, 2, 7, 8, 5, 6 };
 #else
@@ -131,8 +137,10 @@ double compute_equilibrium_profile(Vector velocity,double density,int direction)
 	//terms without density and direction weight
 	feq = 1.0
 		+ (3.0 * p)
-		+ ((9.0 / 2.0) * p2)
-		- ((3.0 / 2.0) * v2);
+		//+ ((9.0 / 2.0) * p2)
+		+ (4.5 * p2)
+		//- ((3.0 / 2.0) * v2);
+		- (1.5 * v2);
 
 	//mult all by density and direction weight
 	feq *= equil_weight[direction] * density;
@@ -227,12 +235,17 @@ void compute_inflow_zou_he_poiseuille_distr( const Mesh *mesh, lbm_mesh_cell_t c
 
 	//now compute unknown microscopic values
 	cell[1] = cell[3];// + (2.0/3.0) * density * v_y <--- no velocity on Y so v_y = 0
-	cell[5] = cell[7] - (1.0/2.0) * (cell[2] - cell[4])
-	                         + (1.0/6.0) * (density * v);
+//	cell[5] = cell[7] - (1.0/2.0) * (cell[2] - cell[4])
+//	                         + (1.0/6.0) * (density * v);
 	                       //+ (1.0/2.0) * density * v_y    <--- no velocity on Y so v_y = 0
-	cell[8] = cell[6] + (1.0/2.0) * (cell[2] - cell[4])
-	                         + (1.0/6.0) * (density * v);
+	cell[5] = cell[7] - 0.5 * (cell[2] - cell[4])
+	                         + 0.166667 * (density * v);
+
+//	cell[8] = cell[6] + (1.0/2.0) * (cell[2] - cell[4])
+//	                         + (1.0/6.0) * (density * v);
 	                       //- (1.0/2.0) * density * v_y    <--- no velocity on Y so v_y = 0
+	cell[8] = cell[6] + 0.5 * (cell[2] - cell[4])
+	                         + 0.166667 * (density * v);
 
 	//no need to copy already known one as the value will be "loss" in the wall at propagatation time
 }
@@ -261,13 +274,19 @@ void compute_outflow_zou_he_const_density(lbm_mesh_cell_t cell)
 	v = -1.0 + (1.0 / density) * (cell[0] + cell[2] + cell[4] + 2 * (cell[1] + cell[5] + cell[8]));
 
 	//now can compute unknown microscopic values
-	cell[3] = cell[1] - (2.0/3.0) * density * v;
-	cell[7] = cell[5] + (1.0/2.0) * (cell[2] - cell[4])
+//	cell[3] = cell[1] - (2.0/3.0) * density * v;
+	cell[3] = cell[1] - 0.666667 * density * v;
+//	cell[7] = cell[5] + (1.0/2.0) * (cell[2] - cell[4])
+//	                         - (1.0/6.0) * (density * v);
 	                       //- (1.0/2.0) * (density * v_y)    <--- no velocity on Y so v_y = 0
-	                         - (1.0/6.0) * (density * v);
-	cell[6] = cell[8] + (1.0/2.0) * (cell[4] - cell[2])
+	cell[7] = cell[5] + 0.5 * (cell[2] - cell[4])
+	                         - 0.166667 * (density * v);
+
+//	cell[6] = cell[8] + (1.0/2.0) * (cell[4] - cell[2])
+//	                         - (1.0/6.0) * (density * v);
 	                       //+ (1.0/2.0) * (density * v_y)    <--- no velocity on Y so v_y = 0
-	                         - (1.0/6.0) * (density * v);
+	cell[6] = cell[8] + 0.5 * (cell[4] - cell[2])
+	                         - 0.166667 * (density * v);
 }
 
 /*******************  FUNCTION  *********************/

@@ -199,8 +199,8 @@ void lbm_comm_sync_ghosts_horizontal( lbm_comm_t * mesh, Mesh *mesh_to_process, 
 void lbm_comm_sync_ghosts_diagonal( lbm_comm_t * mesh, Mesh *mesh_to_process, lbm_comm_type_t comm_type, int target_rank, int x ,int y)
 {
 	//vars
-	//MPI_Status status;
-	MPI_Request request;
+	MPI_Status status;
+	//MPI_Request request;
 
 	//if target is -1, no comm
 	if (target_rank == -1)
@@ -209,14 +209,14 @@ void lbm_comm_sync_ghosts_diagonal( lbm_comm_t * mesh, Mesh *mesh_to_process, lb
 	switch (comm_type)
 	{
 		case COMM_SEND:
-			//MPI_Send( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD);
-			MPI_Isend( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &request);
+			MPI_Send( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD);
+			//MPI_Isend( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &request);
 
 			break;
 		case COMM_RECV:
-			//MPI_Recv( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &status);
-			MPI_Irecv( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &request);
-			MPI_Wait(&request, MPI_STATUS_IGNORE);
+			MPI_Recv( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &status);
+			//MPI_Irecv( Mesh_get_cell( mesh_to_process, x, y ), DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &request);
+			//MPI_Wait(&request, MPI_STATUS_IGNORE);
 			break;
 		default:
 			fatal("Unknown type of communication.");
@@ -360,7 +360,6 @@ void save_frame_all_domain( FILE * fp, Mesh *source_mesh, Mesh *temp )
 	int i = 0;
 	int comm_size, rank ;
 	MPI_Status status;
-
 	//get rank and comm size
 	MPI_Comm_size( MPI_COMM_WORLD, &comm_size );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -370,12 +369,14 @@ void save_frame_all_domain( FILE * fp, Mesh *source_mesh, Mesh *temp )
 	{
 		if( rank == 0 )
 		{
+		unsigned long long int size = source_mesh->width  * source_mesh->height * DIRECTIONS;
 			/* Rank 0 renders its local Mesh */
 			save_frame(fp,source_mesh);
 			/* Rank 0 receives & render other processes meshes */
 			for( i = 1 ; i < comm_size ; i++ )
 			{
-				MPI_Recv( temp->cells, source_mesh->width  * source_mesh->height * DIRECTIONS, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &status );
+//				MPI_Recv( temp->cells, source_mesh->width  * source_mesh->height * DIRECTIONS, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &status );
+				MPI_Recv( temp->cells, size, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &status );
 				save_frame(fp,temp);
 			}
 		} else {
