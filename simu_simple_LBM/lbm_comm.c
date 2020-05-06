@@ -233,9 +233,12 @@ void lbm_comm_sync_ghosts_diagonal( lbm_comm_t * mesh, Mesh *mesh_to_process, lb
 void lbm_comm_sync_ghosts_vertical( lbm_comm_t * mesh, Mesh *mesh_to_process, lbm_comm_type_t comm_type, int target_rank, int y )
 {
 	//vars
-	MPI_Status status;
+	//MPI_Status status;
 	int x, k;
-
+	MPI_Request request[mesh_to_process->width-1];
+	double  *tmp;
+	tmp = malloc(sizeof(double)*DIRECTIONS);
+	
 	//if target is -1, no comm
 	if (target_rank == -1)
 		return;
@@ -245,23 +248,34 @@ void lbm_comm_sync_ghosts_vertical( lbm_comm_t * mesh, Mesh *mesh_to_process, lb
 		case COMM_SEND:
 			for ( x = 1 ; x < mesh_to_process->width - 2 ; x++)
 			{
-			for ( k = 0 ; k < DIRECTIONS ; k++)
-				{
-				MPI_Send( &Mesh_get_cell(mesh_to_process, x, y)[k], 1, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD);
-				}
+			//for ( k = 0 ; k < DIRECTIONS ; k++)
+			//	{
+			//	MPI_Send( &Mesh_get_cell(mesh_to_process, x, y)[k], 1, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD);
+			//	}
+		
+			tmp = Mesh_get_cell(mesh_to_process, x, y);
+				
+			MPI_Isend(  tmp, DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &request[x-1]);
+
 			}
 
 			break;
 		case COMM_RECV:
 			for ( x = 1 ; x < mesh_to_process->width - 2 ; x++)
 			{
-				for ( k = 0 ; k < DIRECTIONS ; k++)
+				//for ( k = 0 ; k < DIRECTIONS ; k++)
+				//{
+				//		MPI_Recv( &Mesh_get_cell(mesh_to_process, x, y)[k], 1, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD,&status);
+				//}
+			MPI_Irecv( tmp, DIRECTIONS, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD, &request[x-1]);
+			MPI_Wait(&request[x-1],MPI_STATUS_IGNORE);
+				
+			for ( k = 0 ; k < DIRECTIONS ; k++)
 				{
-						MPI_Recv( &Mesh_get_cell(mesh_to_process, x, y)[k], 1, MPI_DOUBLE, target_rank, 0, MPI_COMM_WORLD,&status);
-					}
+					Mesh_get_cell(mesh_to_process, x, y)[k] = *(tmp+k); 
 				}
 
-
+			}
 			break;
 		default:
 			fatal("Unknown type of communication.");
