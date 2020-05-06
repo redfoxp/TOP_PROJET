@@ -43,6 +43,9 @@ diff:
 gif:
 	./gen_animate_gif.sh ./resultat.raw ./output.gif
 
+opengif:
+	xdg-open ./output.gif
+
 edit:
 	subl *.c
 	subl *.h
