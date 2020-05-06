@@ -7,6 +7,7 @@ MAKEDEPEND=makedepend
 #flags
 CFLAGS=-Wall -g
 LDFLAGS=-lm
+OPTI_FLAG =-Ofast
 
 #Files
 LBM_SOURCES=main.c lbm_phys.c lbm_init.c lbm_struct.c lbm_comm.c lbm_config.c
@@ -18,13 +19,13 @@ TARGET=lbm display
 all: $(TARGET)
 
 %.o: %.c
-	$(MPICC) $(CFLAGS) -c -o $@ $<
+	$(MPICC) $(CFLAGS) $(OPTI_FLAG) -c -o $@ $<
 
 lbm: $(LBM_OBJECTS)
-	$(MPICC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(MPICC) $(CFLAGS) $(OPTI_FLAG) -o $@ $^ $(LDFLAGS)
 
 display: display.c
-	$(CC) $(CFLAGS) -o $@ display.c
+	$(CC) $(CFLAGS) $(OPTI_FLAG) -o $@ display.c
 
 clean:
 	$(RM) $(LBM_OBJECTS)

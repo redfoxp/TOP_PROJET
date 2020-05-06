@@ -39,7 +39,8 @@ void update_derived_parameter(void)
 {
 	//derived parameter
 	lbm_gbl_config.kinetic_viscosity = (lbm_gbl_config.inflow_max_velocity * 2.0 * lbm_gbl_config.obstacle_r / lbm_gbl_config.reynolds);
-	lbm_gbl_config.relax_parameter = 1.0 / (3.0 * lbm_gbl_config.kinetic_viscosity + 1.0/2.0);
+	lbm_gbl_config.relax_parameter = 1.0 / (3.0 * lbm_gbl_config.kinetic_viscosity + 0.5);
+//	lbm_gbl_config.relax_parameter = 1.0 / (3.0 * lbm_gbl_config.kinetic_viscosity + 1.0/2.0);
 }
 
 /*****************  FUNCTION  *******************/

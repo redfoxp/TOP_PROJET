@@ -185,12 +185,23 @@ void compute_bounce_back(lbm_mesh_cell_t cell)
 	double tmp[DIRECTIONS];
 
 	//compute bounce back
-	for ( k = 0 ; k < DIRECTIONS ; k++)
-		tmp[k] = cell[opposite_of[k]];
+	//for ( k = 0 ; k < DIRECTIONS ; k++)
+	//	tmp[k] = cell[opposite_of[k]];
+	tmp[0] = cell[0];
+	tmp[1] = cell[3];
+	tmp[2] = cell[4];
+	tmp[3] = cell[1];
+	tmp[4] = cell[2];
+	tmp[5] = cell[7];
+	tmp[6] = cell[8];
+	tmp[7] = cell[5];
+	tmp[8] = cell[6];
 
 	//compute bounce back
 	for ( k = 0 ; k < DIRECTIONS ; k++)
 		cell[k] = tmp[k];
+	
+
 }
 
 /*******************  FUNCTION  *********************/
