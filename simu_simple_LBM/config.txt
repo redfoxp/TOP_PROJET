@@ -1,11 +1,11 @@
 iterations           = 100
 width                = 800
 height               = 160
-#obstacle_r           =
-#obstacle_x           =
-#obstacle_y           =
+#obstacle_r           = 
+#obstacle_x           = 
+#obstacle_y           = 
 reynolds             = 100
 inflow_max_velocity  = 0.100000
 inflow_max_velocity  = 0.100000
-output_filename      = result.raw
+output_filename      = resultat.raw
 write_interval       = 20
