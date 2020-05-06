@@ -374,16 +374,19 @@ void save_frame_all_domain( FILE * fp, Mesh *source_mesh, Mesh *temp )
 	int i = 0;
 	int comm_size, rank ;
 	MPI_Status status;
+	MPI_Request request;
 	//get rank and comm size
 	MPI_Comm_size( MPI_COMM_WORLD, &comm_size );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+	
+
 
 	/* If whe have more than one process */
 	if( 1 < comm_size )
 	{
 		if( rank == 0 )
 		{
-		unsigned long long int size = source_mesh->width  * source_mesh->height * DIRECTIONS;
+			unsigned long long int size = source_mesh->width  * source_mesh->height * DIRECTIONS;
 			/* Rank 0 renders its local Mesh */
 			save_frame(fp,source_mesh);
 			/* Rank 0 receives & render other processes meshes */
@@ -395,7 +398,9 @@ void save_frame_all_domain( FILE * fp, Mesh *source_mesh, Mesh *temp )
 			}
 		} else {
 			/* All other ranks send their local mesh */
-			MPI_Send( source_mesh->cells, source_mesh->width * source_mesh->height * DIRECTIONS, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD );
+			//MPI_Send( source_mesh->cells, source_mesh->width * source_mesh->height * DIRECTIONS, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD );
+			MPI_Isend( source_mesh->cells, source_mesh->width * source_mesh->height * DIRECTIONS, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, &request);
+
 		}
 	} else {
 		/* Only 0 renders its local mesh */
