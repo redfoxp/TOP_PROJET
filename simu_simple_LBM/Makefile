@@ -34,6 +34,15 @@ clean:
 depend:
 	$(MAKEDEPEND) -Y. $(LBM_SOURCES) display.c
 
+run:
+	mpirun -np 4 ./lbm
+
+diff:
+	diff -y resultat.raw ../Reference/resultat.raw
+	
+gif:
+	./gen_animate_gif.sh ./resultat.raw ./output.gif
+
 edit:
 	subl *.c
 	subl *.h
