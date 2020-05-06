@@ -280,7 +280,7 @@ void compute_outflow_zou_he_const_density(lbm_mesh_cell_t cell)
 	v = -1.0 + (1.0 / density) * (cell[0] + cell[2] + cell[4] + 2 * (cell[1] + cell[5] + cell[8]));
 
 	//now can compute unknown microscopic values
-	cell[3] = cell[1] - (2.0/3.0) * density * v;
+//	cell[3] = cell[1] - (2.0/3.0) * density * v;
 	cell[3] = cell[1] - 0.666667 * density * v;
 //	cell[7] = cell[5] + (1.0/2.0) * (cell[2] - cell[4])
 //	                         - (1.0/6.0) * (density * v);
